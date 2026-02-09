@@ -777,7 +777,10 @@ export default class RequestHandler {
     ) => void,
   ): void {
     const path = file.path;
+    const vaultPath = (this.app.vault.adapter as any).basePath;
+    const fullPath = `${vaultPath}/${path}`;
     res.set("Content-Location", encodeURI(path));
+    res.set("X-Full-Path", fullPath);
 
     return handler(path, req, res);
   }
