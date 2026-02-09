@@ -27,20 +27,7 @@ export enum ErrorCode {
 }
 
 export interface LocalRestApiSettings {
-  apiKey?: string;
-  crypto?: {
-    cert: string;
-    privateKey: string;
-    publicKey: string;
-  };
-  port: number;
-  insecurePort: number;
-  enableInsecureServer: boolean;
-  enableSecureServer?: boolean;
-
-  authorizationHeaderName?: string;
-  bindingHost?: string;
-  subjectAltNames?: string;
+  socketPath: string;
 }
 
 export interface HeadingBoundary {

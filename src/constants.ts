@@ -3,9 +3,7 @@ import { ErrorCode, LocalRestApiSettings } from "./types";
 export const CERT_NAME = "obsidian-local-rest-api.crt";
 
 export const DEFAULT_SETTINGS: LocalRestApiSettings = {
-  port: 27124,
-  insecurePort: 27123,
-  enableInsecureServer: false,
+  socketPath: "", // Set dynamically based on vault path
 };
 
 export const ERROR_CODE_MESSAGES: Record<ErrorCode, string> = {

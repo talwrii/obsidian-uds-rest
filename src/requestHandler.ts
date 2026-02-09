@@ -141,14 +141,8 @@ export default class RequestHandler {
   }
 
   requestIsAuthenticated(req: express.Request): boolean {
-    const authorizationHeader = req.get(
-      this.settings.authorizationHeaderName ?? "Authorization",
-    );
-    if (authorizationHeader === `Bearer ${this.settings.apiKey}`) {
-      return true;
-    }
-
-    return false;
+    // With Unix domain sockets, authentication is handled via filesystem permissions
+    return true;
   }
 
   async authenticationMiddleware(
@@ -156,22 +150,7 @@ export default class RequestHandler {
     res: express.Response,
     next: express.NextFunction,
   ): Promise<void> {
-    const authenticationExemptRoutes: string[] = [
-      "/",
-      `/${CERT_NAME}`,
-      "/openapi.yaml",
-    ];
-
-    if (
-      !authenticationExemptRoutes.includes(req.path) &&
-      !this.requestIsAuthenticated(req)
-    ) {
-      this.returnCannedResponse(res, {
-        errorCode: ErrorCode.ApiKeyAuthorizationRequired,
-      });
-      return;
-    }
-
+    // No authentication needed - filesystem permissions control access
     next();
   }
 
@@ -258,30 +237,16 @@ export default class RequestHandler {
   }
 
   root(req: express.Request, res: express.Response): void {
-    let certificate: forge.pki.Certificate | undefined;
-    try {
-      certificate = forge.pki.certificateFromPem(this.settings.crypto.cert);
-    } catch (e) {
-      // This is fine, we just won't include that in the output
-    }
-
     res.status(200).json({
       status: "OK",
       manifest: this.manifest,
+      socketPath: this.settings.socketPath,
       versions: {
         obsidian: apiVersion,
         self: this.manifest.version,
       },
-      service: "Obsidian Local REST API",
+      service: "Obsidian Unix Domain Sockets REST API",
       authenticated: this.requestIsAuthenticated(req),
-      certificateInfo:
-        this.requestIsAuthenticated(req) && certificate
-          ? {
-              validityDays: getCertificateValidityDays(certificate),
-              regenerateRecommended:
-                !getCertificateIsUptoStandards(certificate),
-            }
-          : undefined,
       apiExtensions: this.requestIsAuthenticated(req)
         ? this.apiExtensions.map(({ manifest }) => manifest)
         : undefined,
@@ -1216,11 +1181,8 @@ export default class RequestHandler {
     req: express.Request,
     res: express.Response,
   ): Promise<void> {
-    res.set(
-      "Content-type",
-      `application/octet-stream; filename="${CERT_NAME}"`,
-    );
-    res.status(200).send(this.settings.crypto.cert);
+    // No certificates with Unix domain sockets
+    res.status(404).json({ error: "Certificates not used with Unix domain sockets" });
   }
 
   async openapiYamlGet(

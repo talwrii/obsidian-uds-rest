@@ -1,9 +1,12 @@
 {
-  "name": "obsidian-local-rest-api",
-  "version": "3.4.2",
-  "description": "Get, change or otherwise interact with your notes in Obsidian via a REST API.",
+  "name": "obsidian-uds-rest",
+  "version": "1.0.0",
+  "description": "Get, change or otherwise interact with your notes in Obsidian via Unix domain sockets.",
   "main": "main.js",
   "types": "main.d.ts",
+  "bin": {
+    "obsidian-cli": "./cli.js"
+  },
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
